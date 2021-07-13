@@ -62,15 +62,19 @@ class TravelerProblem:
         matrix_size: tuple = (100, 100),
         objective: tuple = (50, 50),
         number_of_iterations: int = 10,
+        start_position: tuple = None,
+        movement_list: list = None,
     ):
         self.__matrix_size = Position(matrix_size[0], matrix_size[1])
         self.__objective = Position(objective[0], objective[1])
         self.__number_of_iterations = number_of_iterations
+        self.__start_position = Position(start_position[0], start_position[1])
+        self.__movement_list = movement_list
 
     """ properties of matrix_size """
 
     @property
-    def matrix_size(self):
+    def matrix_size(self) -> Position:
         return self.__matrix_size
 
     @matrix_size.setter
@@ -81,7 +85,7 @@ class TravelerProblem:
     """ properties of objective """
 
     @property
-    def objective(self):
+    def objective(self) -> Position:
         return self.__objective
 
     @objective.setter
@@ -99,6 +103,27 @@ class TravelerProblem:
     def number_of_iterations(self, value: int):
         self.__number_of_iterations = value
 
+    """ properties of start position """
+
+    @property
+    def start_position(self) -> Position:
+        return self.__start_position
+
+    @start_position.setter
+    def start_position(self, point: tuple):
+        self.__start_position.x = point[0]
+        self.__start_position.y = point[1]
+
+    """ properties of movement list """
+
+    @property
+    def movement_list(self) -> list:
+        return self.__start_position
+
+    @start_position.setter
+    def movement_list(self, movement_list: list):
+        self.__movement_list = movement_list
+        
     """ carrying out the experiment """
     """ the Point class objects are converted to numpy arrays for better computational efficiency"""
     carry_exp_desc = (
@@ -108,18 +133,24 @@ class TravelerProblem:
 
     def carry_experiment(self) -> carry_exp_desc:
         rng = np.random.default_rng()
-        start_position = np.array(
-            [
-                rng.integers(0, self.__matrix_size.x),
-                rng.integers(0, self.__matrix_size.y),
-            ]
-        )
+        if self.__start_position is None:
+            start_position = np.array(
+                [
+                    rng.integers(0, self.__matrix_size.x),
+                    rng.integers(0, self.__matrix_size.y),
+                ]
+            )
+        else:
+            start_position = np.array(
+                [self.__start_position.x, self.__start_position.y]
+            )
+        if self.__movement_list is None:
+            movement = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         current_position = np.copy(start_position)
         objective = np.array([self.__objective.x, self.__objective.y])
         shortest_path = objective - start_position
         lower_boundary = np.array([0, 0])
         upper_boundary = np.array([self.__matrix_size.x, self.__matrix_size.y])
-        movement = [[1, 0], [-1, 0], [0, 1], [0, -1]]
         number_of_moves = 0
         number_of_moves_list = []
 
